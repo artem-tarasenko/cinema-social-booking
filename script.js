@@ -46,12 +46,16 @@ function checkSeat(seat, direction) {
     } 
 }
 
-function checkSiblings(node) {
-    const prevSibling = node.nextElementSibling;
-    const nextSibling = node.prevElementSibling;
+function checkSiblings(node, checkingClass) {
+    const prevSibling = node.previousElementSibling;
+    const nextSibling = node.nextElementSibling;
+    console.log("Check Siblings # returning > ", {
+        prev: prevSibling.classList.contains(checkingClass), 
+        next: nextSibling.classList.contains(checkingClass)
+    })
     return {
-        prevIsAvailable: !prevSibling.classList.contains("blocked"), 
-        nextIsAvailable: !nextSibling.classList.contains("blocked")
+        prev: prevSibling.classList.contains(checkingClass), 
+        next: nextSibling.classList.contains(checkingClass)
     }
 }
 
@@ -100,25 +104,29 @@ container.addEventListener("click", function(e) {
         return
     }
     
+    // IF seat is BLOCKED
+    if(e.target.classList.contains("blocked")) return console.log("Seat is blocked");
 
     // IF seat is NOT OCCUPIED
     if (e.target.classList.contains("seat") && !e.target.classList.contains("occupied")) {
         console.log("Event listener # Seat is not occupied");
         const clickedSeat = e.target;
 
-        if(clickedSeat.classList.contains("blocked")) return console.log("Seat is blocked");
-
+        debugger
         if(clickedSeat.classList.contains("preblocked")) {
             processClasses(clickedSeat, ["preblocked"], "remove");
         }
 
         processClasses(clickedSeat, ["selected"], "add");
-
-        // console.log("TARGET", clickedSeat, clickedSeat.nextElementSibling, clickedSeat.previousElementSibling)
-
         
-        clickedSeat.nextElementSibling && !clickedSeat.nextElementSibling.classList.contains("selected") && clickedSeat.nextElementSibling.classList.toggle("preblocked");
-        clickedSeat.previousElementSibling && !clickedSeat.previousElementSibling.classList.contains("selected") && clickedSeat.previousElementSibling.classList.toggle("preblocked");
+        const siblingsBlocked = checkSiblings(clickedSeat, "blocked");
+
+        if (!siblingsBlocked.next) clickedSeat.nextElementSibling.classList.toggle("preblocked");
+        if (!siblingsBlocked.prev) clickedSeat.previousElementSibling.classList.toggle("preblocked");
+
+
+        // clickedSeat.nextElementSibling && !clickedSeat.nextElementSibling.classList.contains("selected") && clickedSeat.nextElementSibling.classList.toggle("preblocked");
+        // clickedSeat.previousElementSibling && !clickedSeat.previousElementSibling.classList.contains("selected") && clickedSeat.previousElementSibling.classList.toggle("preblocked");
         updateSelectedCount();
 
         return
