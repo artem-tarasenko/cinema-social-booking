@@ -46,6 +46,15 @@ function checkSeat(seat, direction) {
     } 
 }
 
+function checkSiblings(node) {
+    const prevSibling = node.nextElementSibling;
+    const nextSibling = node.prevElementSibling;
+    return {
+        prevIsAvailable: !prevSibling.classList.contains("blocked"), 
+        nextIsAvailable: !nextSibling.classList.contains("blocked")
+    }
+}
+
 
 
 function processClasses( node, classes, action) {
@@ -105,8 +114,9 @@ container.addEventListener("click", function(e) {
 
         processClasses(clickedSeat, ["selected"], "add");
 
-        console.log("TARGET", clickedSeat, clickedSeat.nextElementSibling, clickedSeat.previousElementSibling)
+        // console.log("TARGET", clickedSeat, clickedSeat.nextElementSibling, clickedSeat.previousElementSibling)
 
+        
         clickedSeat.nextElementSibling && !clickedSeat.nextElementSibling.classList.contains("selected") && clickedSeat.nextElementSibling.classList.toggle("preblocked");
         clickedSeat.previousElementSibling && !clickedSeat.previousElementSibling.classList.contains("selected") && clickedSeat.previousElementSibling.classList.toggle("preblocked");
         updateSelectedCount();
