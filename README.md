@@ -1,9 +1,9 @@
 ## Movie Seat Booking with social distance applied
 
-This is a small training project that initially was meant to allow people buy tickets to the cinema but with some additional logic implemented.
-Not long ago I went to the cinema with my friends (5 of us), we bought tickets online and so when I saw the cinema's "pandemic style" app for buying tickets it left me with some questions. The thing is, they blocked every third chair to make some distance between people and that's it. As a result we bought 2 sets of 2 seats and 1 of 2 from the third pair. That meats that we occupied a total of 8 seats (including 2 blocked for distancing) for 5 people and could in fact seat in any of those. Well that might be not bad for social distance but not good eigher for the optimal seats usage.
+This is a small training project that initially was meant to allow people to buy tickets to the cinema but with some additional logic implemented. Not long ago I went to the cinema with my friends (5 of us), we bought tickets online and so when I saw the cinema's "pandemic style" app for buying tickets it left me with some questions. The thing is, they blocked every third chair to make some distance between people and that's it. As a result, we bought 2 sets of 2 seats and 1 of 2 from the third pair. That means that we occupied a total of 8 seats (including 2 blocked for distancing) for 5 people and could in fact seat in any of those. Well, that might be not bad for social distance but not good either for the optimal seat usage.
 
-So, I thought that would be a nice touch to this simple project to add here some logic for basic social distancing with a bit of optimisation.
+So, I thought that would be a nice touch to this simple project to add here some logic for basic social distancing with a bit of optimization.
+
 
 
 ## Project Specifications
