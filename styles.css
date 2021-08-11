@@ -77,7 +77,7 @@ body {
     margin-left: 40px;
 }
 
-.seat:not(.occupied):hover {
+.seat:not(.occupied):not(.blocked):hover {
     cursor: pointer;
     transform: scale(1.2);
 }

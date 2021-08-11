@@ -1,169 +1,110 @@
 const container = document.querySelector(".container");
-const seats = document.querySelectorAll(".row .seat:not(.occupied)");
-
 const count = document.getElementById("count");
 const total = document.getElementById("total");
 const movieSelect = document.getElementById("movie");
+let ticketPrice = +movieSelect.value; //convert string to a number utilising math operator's logic
 
-//by adding + before string variable we convert it to number utilising math operators logic
-let ticketPrice = +movieSelect.value;
 
-//changing value in P tag
+//render info about selected tickets and price into P tag below seats
 function updateSelectedCount() {
-    // debugger;
-    const selectedSeats = document.querySelectorAll(".row .seat.selected");
-    const selectedSeatsCount = selectedSeats.length;
-
-    count.innerText = selectedSeatsCount;
-    total.innerText = selectedSeatsCount * ticketPrice;
+    const selectedSeats = container.querySelectorAll(".seat.selected");
+    
+    count.innerText = selectedSeats.length;
+    total.innerText = selectedSeats.length * ticketPrice;
 }
 
+//set blocked state around occupied seats 
+//fot the sake of example only
 function setSocialDistance() {
     const occupiedSeats = [...container.querySelectorAll(".occupied")];
-    // console.log("Seats occupied: ", occupiedSeats);
 
     occupiedSeats.forEach( seat => {
-        // console.log("Init Seat", seat);
-        // console.log("Initial seat num: ", seat.dataset.seat);
+        const nextEl = seat.nextElementSibling;
+        const prevEl = seat.previousElementSibling;
 
-        checkSeat(seat.previousElementSibling, "previuos");
-        checkSeat(seat.nextElementSibling, "next");
+        nextEl && !nextEl.classList.contains('occupied') && processClasses(nextEl, ['blocked'], 'add');
+        prevEl && !prevEl.classList.contains('occupied') && processClasses(prevEl, ['blocked'], 'add');
+    });
+}
+
+//function to make all preblocked seats to blocked after purchasing (not used)
+//should be used when the client buying selected seats.
+function convertPreblockedSeats() {
+    const seatsToConvert = [...container.querySelectorAll('.preblocked')];
+    seatsToConvert.forEach( seat => {
+        processClasses( seat, 'preblocked', 'remove');
+        processClasses( seat, 'blocked', 'add');
     })
 }
 
-
-function checkSeat(seat, direction) {
-    // debugger;
-    // console.log("Seat", seat);
-    if(!seat) return
-
-    // console.log("Num of sibling to check", seat.dataset.number);
-    if(seat.classList.contains("selected") || seat.classList.contains("occupied")) {
-        // console.log("Seat is selected...");
-        direction === "next" && checkSeat(seat.nextElementSibling);
-        direction === "previuos" && checkSeat(seat.previuosElementSibling);
-    } else {
-        // console.log("Not selected, blocking...");
-        seat.classList.add("blocked");
-    } 
-}
-
-function checkSiblings(node, addClass, checkingClass1 = '', checkingClass2 = '', checkingClass3 = '') {
-    const prevSibling = node.previousElementSibling;
-    const nextSibling = node.nextElementSibling;
-
-    const prevSibAvailable = prevSibling ? ![...prevSibling.classList].some( cls =>  cls === checkingClass1 || cls === checkingClass2 || cls === checkingClass3) : false;
-    const nextSibAvailable = nextSibling ? ![...nextSibling.classList].some( cls =>  cls === checkingClass1 || cls === checkingClass2 || cls === checkingClass3) : false;
-    
-    if(prevSibAvailable) processClasses(prevSibling, [addClass], "add");
-    if(nextSibAvailable) processClasses(nextSibling, [addClass], "add");
-    
-
-}
-
-function processClasses( node, classes, action) {
+//shorthand to work with element's classes
+function processClasses( node, classes = [], action = '') {
     if(action === "add") return classes.forEach( cls => node.classList.add(cls));
-
     if(action === "remove") return classes.forEach( cls => node.classList.remove(cls));
-
     if(action === "toggle") return classes.forEach( cls => node.classList.toggle(cls))
 }
 
-function processSiblings(node, direction, abortClass, newClass) {
-    if(direction === "next") {
-        node.classList.add(newClass);
-        !node.nextElementSibling.classList.contains(abortClass) && processClasses( node.nextElementSibling, [newClass], "remove");
-        return 
-    }
-
-    if(direction === "prev") {
-        node.classList.add(newClass);
-        !node.previousElementSibling.classList.contains(abortClass) && processClasses( node.previousElementSibling, [newClass], "remove");
-        return
-    }
-
-    if(direction === "both") {
-        node.classList.add(newClass);
-        !node.nextElementSibling.classList.contains(abortClass) && processClasses( node.nextElementSibling, [newClass], "remove");
-        !node.previousElementSibling.classList.contains(abortClass) && processClasses( node.previousElementSibling, [newClass], "remove");
-        (!node.nextElementSibling.classList.contains(abortClass) && !node.previousElementSibling.classList.contains(abortClass)) && node.classList.remove(newClass);
-        return
-    }
-}
-
+//This function sets "preblocked" state to neighbours of each selected seat
 function preblockAllSelected() {
-    
     const selectedSeats = container.querySelectorAll(".selected");
-    selectedSeats.forEach( seat => {
-        nextSeatAvailable = seat.nextElementSibling ? ![...seat.nextElementSibling.classList].some( cls => cls === "blocked" || cls === "preblocked" || cls === "selected") : false;
-        prevSeatAvailable = seat.previousElementSibling ? ![...seat.previousElementSibling.classList].some( cls => cls === "blocked" || cls === "preblocked" || cls === "selected") : false;
 
-        nextSeatAvailable && seat.nextElementSibling.classList.add("preblocked");
-        prevSeatAvailable && seat.previousElementSibling.classList.add("preblocked")
+    selectedSeats.forEach( seat => {
+        //get surrounding seats
+        let nextEl = seat.nextElementSibling;
+        let prevEl = seat.previousElementSibling;
+
+        //redeclare variables to contain Bool (true - seat can be preblocked, false - not)
+        nextEl 
+            ? nextEl = ![...nextEl.classList].some( cls => cls === "blocked" || cls === "preblocked" || cls === "selected") 
+            : nextEl = false;
+
+        prevEl 
+            ? prevEl = ![...seat.previousElementSibling.classList].some( cls => cls === "blocked" || cls === "preblocked" || cls === "selected") 
+            : prevEl = false;
+
+        //add classes
+        nextEl && seat.nextElementSibling.classList.add("preblocked");
+        prevEl && seat.previousElementSibling.classList.add("preblocked");
     })
 }
 
+//emulate partly-occupied cinema
+setSocialDistance();
+
+
+// s**********************************************************
+//      EVENT LISTENERS 
+// s**********************************************************
+
 //listener to handle seats and counter
 container.addEventListener("click", function(e) {
+    const seat = e.target;
 
-     // IF seat is SELECTED
-    if (e.target.classList.contains("seat") && e.target.classList.contains("selected")) {
-        
-        
-        const clickedSeat = e.target;
-        console.log("UNSELECTING/...")
-        processClasses(clickedSeat, ["selected"], "remove");
+    // IF seat is SELECTED
+    if (seat.classList.contains("seat") && seat.classList.contains("selected")) {
+        const nextEl = seat.nextElementSibling;
+        const prevEl = seat.previousElementSibling;
+        processClasses(seat, ["selected"], "remove");
 
-        if(clickedSeat.nextElementSibling && clickedSeat.nextElementSibling.classList.contains("selected") 
-            || clickedSeat.previousElementSibling && clickedSeat.previousElementSibling.classList.contains("selected")) {
-                clickedSeat.classList.add("preblocked");
-            }
-
-        clickedSeat.nextElementSibling && clickedSeat.nextElementSibling.classList.remove('preblocked')
-        clickedSeat.previousElementSibling && clickedSeat.previousElementSibling.classList.remove('preblocked')
+        nextEl && processClasses(nextEl, ["preblocked"], "remove");
+        prevEl && processClasses(prevEl, ["preblocked"], "remove");
         
         preblockAllSelected();
         updateSelectedCount();
         return
     }
-    
-    // IF seat is BLOCKED
-    if(e.target.classList.contains("blocked")) return console.log("Seat is blocked");
 
-    // IF seat is NOT OCCUPIED
-    if (e.target.classList.contains("seat") && !e.target.classList.contains("occupied")) {
-        console.log("Event listener # Seat is not occupied");
-        const clickedSeat = e.target;
-
-        // debugger
-        if(clickedSeat.classList.contains("preblocked")) {
-            processClasses(clickedSeat, ["preblocked"], "remove");
-        }
-
-        processClasses(clickedSeat, ["selected"], "add");
-
+    // IF seat is NOT OCCUPIED and NOT BLOCKED
+    if ([...seat.classList].some( cls => cls === "seat" && cls !== "occupied" && cls !== "blocked")) {
+        //is "preblocked" - make it "selected"
+        if(seat.classList.contains("preblocked")) processClasses(seat, ["preblocked"], "remove")
+        processClasses(seat, ["selected"], "add");
         
-        checkSiblings(clickedSeat, "preblocked", "blocked", "selected");
-        // checkSiblings(clickedSeat, "selected", "preblocked");
-
-        // if (!siblingsBlocked.next) clickedSeat.nextElementSibling.classList.toggle("preblocked");
-        // if (!siblingsBlocked.prev) clickedSeat.previousElementSibling.classList.toggle("preblocked");
-
-
-        // clickedSeat.nextElementSibling && !clickedSeat.nextElementSibling.classList.contains("selected") && clickedSeat.nextElementSibling.classList.toggle("preblocked");
-        // clickedSeat.previousElementSibling && !clickedSeat.previousElementSibling.classList.contains("selected") && clickedSeat.previousElementSibling.classList.toggle("preblocked");
+        preblockAllSelected()
         updateSelectedCount();
-
         return
     }
-
-   
-    //IF SEAT is BLOCKED or OCCUPIED
-
-
 })
-
-setSocialDistance();
 
 movieSelect.addEventListener("change", e => {
     ticketPrice = e.target.value; //value of Option
